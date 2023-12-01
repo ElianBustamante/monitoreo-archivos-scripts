@@ -1,0 +1,4 @@
+{
+    "FROM": "tu_correo@gmail.com",
+    "TO": "correo_destino@gmail.com"
+}
