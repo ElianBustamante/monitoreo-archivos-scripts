@@ -4,9 +4,11 @@ import smtplib
 import time
 import sys
 import json
+import logging
 from email.message import EmailMessage
 
-import json
+# Configuración del registro de eventos
+logging.basicConfig(filename='monitoring.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Función para obtener los correos desde el archivo de configuración
 def obtener_correos():
@@ -15,7 +17,7 @@ def obtener_correos():
     from_address = config.get('FROM')
     to_address = config.get('TO')
     if not from_address or not to_address:
-        print("El archivo de configuración debe contener los correos 'FROM' y 'TO'.")
+        logging.error("El archivo de configuración debe contener los correos 'FROM' y 'TO'.")
         return None, None
     return from_address, to_address
 
@@ -34,8 +36,9 @@ def testear_correo():
         s = smtplib.SMTP('localhost')
         s.send_message(msg)
         s.quit()
+        logging.info("Correo de prueba enviado exitosamente.")
     except smtplib.SMTPException:
-        print("Error al enviar el correo de prueba. Finalizando el programa.")
+        logging.error("Error al enviar el correo de prueba. Finalizando el programa.")
         sys.exit(1)
 
 # Función para calcular el hash del archivo
@@ -57,6 +60,7 @@ def enviar_correo():
     s = smtplib.SMTP('localhost')
     s.send_message(msg)
     s.quit()
+    logging.info("Correo de alerta enviado.")
 
 # Función para iniciar el monitoreo del archivo, verificando si ha sido modificado o no, y enviando el correo de alerta.
 def iniciar_monitoreo():
@@ -68,6 +72,7 @@ def iniciar_monitoreo():
             enviar_correo()
             print('\n[Estado archivo SHADOW: MODIFICADO]')
             print('*** [ALERTA] Archivo SHADOW ha sido modificado ***\n')
+            logging.warning("Archivo SHADOW ha sido modificado.")
             time.sleep(5)
         else: 
             print('\n[Estado archivo SHADOW: CORRECTO]\n')
